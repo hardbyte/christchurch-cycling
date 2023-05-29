@@ -4,8 +4,7 @@ data from https://smartview.ccc.govt.nz/map/layers/ecocounter
 
 The data directory contains a sample of the cycle count data.
 
-The live data is also available on GCP:
-https://storage.googleapis.com/hardbyte-ccc/cycling-counters.parquet
+TODO: The data may be updated nightly and made available on GCP in parquet and duckdb formats.
 
 To run the scraper script [install poetry](https://python-poetry.org/) and Python3.11+.
 
@@ -19,8 +18,7 @@ python main.py
 ```
 
 
-
-Ideas:
+## Ideas:
 
 - Python script to get the data and make available as a CSV/parquet file. 
 - Run nightly (GCP Build Job, Cloud Task) and upload data somewhere public.
@@ -30,20 +28,27 @@ Ideas:
 
 ## Examples
 
-WIP some examples of querying the DuckDB database: 
+After you have run the `main.py` script you will have a duckdb database that you can query directly.
+
+Install duckdb - https://duckdb.org/docs/installation/index and start a DB console with:
+
+```shell
+duckdb duck.db
+```
+
+Some example SQL queries: 
 
 ### Get all the raw counts for each site for the last 30 days:
 
 
 ```sql
-    select 
-        sites.name, cycling_counts.date, cycling_counts.value
-    from 
-        sites, cycling_counts
-    where 
-        cycling_counts.site = sites.oid
-        and current_date - cycling_counts.date < 30
-
+select 
+    sites.name, cycling_counts.date, cycling_counts.value
+from 
+    sites, cycling_counts
+where 
+    cycling_counts.site = sites.oid
+    and current_date - cycling_counts.date < 30
 ```
 
 ### 7 day moving average for a site
@@ -62,4 +67,19 @@ from
 where 
     cycling_counts.site = sites.oid
     order by "Name", "Date"
+```
+
+### Output
+
+Duckdb can output to csv/parquet and much much more. 
+Ref https://duckdb.org/docs/sql/statements/copy
+
+```sql
+COPY (
+    SELECT 
+        site, date, value, sites.name, sites.x, sites.y 
+    FROM sites, cycling_counts
+    WHERE 
+        cycling_counts.site = sites.oid
+) TO 'data/cycling-counters.parquet' (FORMAT PARQUET);
 ```

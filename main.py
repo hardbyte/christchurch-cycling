@@ -125,7 +125,6 @@ if __name__ == '__main__':
                 add_site_counts_to_db(db, measurement_data)
         db.commit()
 
-    # Example 3 - Output
     # We will just output cycle counts to parquet file:
     db.execute("""
     COPY (
