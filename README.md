@@ -28,7 +28,8 @@ python main.py
 
 ## Examples
 
-After you have run the `main.py` script you will have a duckdb database that you can query directly.
+After you have run the `main.py` script you will have a duckdb database that you can query directly. You can also
+download mine from https://storage.googleapis.com/hardbyte-ccc/duck.db
 
 Install duckdb - https://duckdb.org/docs/installation/index and start a DB console with:
 
