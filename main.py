@@ -1,4 +1,3 @@
-
 from enum import StrEnum
 from typing import Tuple
 
@@ -71,15 +70,17 @@ def get_db_connection(db_filename=None):
 def create_tables(conn):
 
     conn.execute("""
-    create table sites (
+    create table if not exists sites (
         oid VARCHAR,
-        installed_date Date,
-        info VARCHAR
+        name VARCHAR,
+        info VARCHAR,
+        x DOUBLE,
+        y DOUBLE
     )
     """)
 
     conn.execute("""
-    create table cycling_counts (
+    create table if not exists cycling_counts (
         site VARCHAR,
         date Date,
         value Integer
@@ -87,26 +88,51 @@ def create_tables(conn):
     """)
 
 
+def add_site_counts_to_db(db, measurement_data):
+
+    db.executemany(
+        "insert into cycling_counts VALUES (?, ?, ?)",
+        [
+           [site_oid, x, y] for (x, y) in zip(measurement_data.x, measurement_data.y)
+        ]
+    )
+
+
+
 if __name__ == '__main__':
-    db = get_db_connection()
-    create_tables(db)
-    print("Downloading list of sites")
-    sites = download_cycling_sites()
+    db = get_db_connection('duck.db')
+    REFRESH_DATA = True
 
-    for s in sites:
-        if not s.properties.total:
-            print(s.properties.oid, s.properties.name, s.geometry)
+    if REFRESH_DATA:
+        create_tables(db)
+        print("Downloading cycle counts")
+        sites = download_cycling_sites()
 
-            site_oid = s.properties.oid
-            measurement_data = download_cycling_count_data(site_oid)
+        for s in sites:
+            if not s.properties.total:
+                site_oid = s.properties.oid
+                print(site_oid, s.properties.name, s.geometry.coordinates)
+                db.execute("""
+                    insert into sites VALUES (?, ?, ?, ?, ?)
+                """, [
+                    site_oid,
+                    s.properties.name,
+                    s.properties.json(),
+                    *s.geometry.coordinates
+                ])
 
-            db.executemany("insert into cycling_counts VALUES (?, ?, ?)",
-               [
-                   [site_oid, x, y] for (x, y) in zip(measurement_data.x, measurement_data.y)
-               ]
-            )
+                measurement_data = download_cycling_count_data(site_oid)
+                add_site_counts_to_db(db, measurement_data)
+        db.commit()
 
-    # Output to parquet file:
+    # Example 3 - Output
+    # We will just output cycle counts to parquet file:
     db.execute("""
-    COPY (SELECT date, value from cycling_counts) TO 'cycling-counters.parquet' (FORMAT PARQUET);
+    COPY (
+        SELECT 
+            site, date, value, sites.name, sites.x, sites.y 
+        FROM sites, cycling_counts
+        WHERE 
+            cycling_counts.site = sites.oid
+    ) TO 'data/cycling-counters.parquet' (FORMAT PARQUET);
     """)
