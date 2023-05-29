@@ -24,6 +24,8 @@ python main.py
 - Run nightly (GCP Build Job, Cloud Task) and upload data somewhere public.
 - Metabase Dashboard (Add people who care as Admin)
 
+Live version of this graph
+- https://cyclingchristchurch.co.nz/2023/01/21/chch-cycle-counter-update-2022-lockdown-jitters/
 
 
 ## Examples
