@@ -30,8 +30,11 @@ Live version of this graph
 
 ## Examples
 
-After you have run the `main.py` script you will have a duckdb database that you can query directly. You can also
-download mine from https://storage.googleapis.com/hardbyte-ccc/duck.db
+After you have run the `main.py` script you will have a local duckdb database with current data that
+you can query directly. 
+
+You can also download mine from https://storage.googleapis.com/hardbyte-ccc/duck.db or, query the parquet data
+which I commit to the repository.
 
 Install duckdb - https://duckdb.org/docs/installation/index and start a DB console with:
 
@@ -45,6 +48,7 @@ Some example SQL queries:
 
 ```bash
 $ duckdb -s "select name, value from 'data/cycling-counters.parquet' where date = today() order by value desc limit 10;"
+
 ┌──────────────────────────┬───────┐
 │           name           │ value │
 │         varchar          │ int32 │

@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Brian Thorne <brian@hardbyte.nz>"]
 readme = "README.md"
-packages = [{include = "ccc_cycling"}]
+packages = []
 
 [tool.poetry.dependencies]
 python = "^3.10"
