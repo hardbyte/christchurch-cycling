@@ -41,6 +41,29 @@ duckdb duck.db
 
 Some example SQL queries: 
 
+### Get today's top 10 readings!
+
+```bash
+$ duckdb -s "select name, value from 'data/cycling-counters.parquet' where date = today() order by value desc limit 10;"
+┌──────────────────────────┬───────┐
+│           name           │ value │
+│         varchar          │ int32 │
+├──────────────────────────┼───────┤
+│ Eco Display Total Counts │  1956 │
+│ South Hagley Park        │  1821 │
+│ North Hagley Park        │  1619 │
+│ Railway Cwy              │   904 │
+│ University Dr            │   891 │
+│ St Asaph St              │   804 │
+│ Antigua Street           │   759 │
+│ Collins Street           │   702 │
+│ Main Rd total cyclists   │   552 │
+│ Cashmere Rd              │   550 │
+├──────────────────────────┴───────┤
+│ 10 rows                2 columns │
+└──────────────────────────────────┘
+```
+
 ### Get all the raw counts for each site for the last 30 days:
 
 
