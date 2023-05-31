@@ -39,7 +39,7 @@ jobs:
       - name: Scrape Data
         run: |
           source $VENV
-          python run main.py
+          python main.py
         timeout-minutes: 30
       - name: Upload Data Artifact
         uses: actions/upload-artifact@v2
